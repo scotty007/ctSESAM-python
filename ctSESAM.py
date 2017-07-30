@@ -49,37 +49,48 @@ def run_gui():
             self.master.title('c\'t SESAM')
             self.master.resizable(width=False, height=False)
 
-            pad = {'padx': 2, 'pady': 2}
+            sticky_e = {'sticky': tk.E, 'padx': 2, 'pady': 2}
+            sticky_ew = {'sticky': tk.EW, 'padx': 2, 'pady': 2}
 
             self._tk_master_password_var = tk.StringVar()
             tk.Label(master=self, text='Masterpasswort:') \
-                .grid(column=0, row=0, sticky=tk.E, **pad)
+                .grid(column=0, row=0, **sticky_e)
             tk_entry = tk.Entry(master=self, textvariable=self._tk_master_password_var,
                                 show='*')
-            tk_entry.grid(column=1, row=0, **pad)
+            tk_entry.grid(column=1, row=0, columnspan=2, **sticky_ew)
             tk_entry.focus_set()
 
             self._tk_domain_var = tk.StringVar()
             tk.Label(master=self, text='Domain:') \
-                .grid(column=0, row=1, sticky=tk.E, **pad)
+                .grid(column=0, row=1, **sticky_e)
             tk.Entry(master=self, textvariable=self._tk_domain_var) \
-                .grid(column=1, row=1, **pad)
+                .grid(column=1, row=1, columnspan=2, **sticky_ew)
 
             self._tk_password_var = tk.StringVar()
             tk.Label(master=self, text='Passwort:') \
-                .grid(column=0, row=2, sticky=tk.E, **pad)
-            tk.Label(master=self, textvariable=self._tk_password_var) \
-                .grid(column=1, row=2, sticky=tk.W, **pad)
+                .grid(column=0, row=2, **sticky_e)
+            self._tk_password_entry = tk.Entry(master=self, state=tk.DISABLED,
+                                               textvariable=self._tk_password_var,
+                                               disabledbackground=tk_entry['bg'],
+                                               disabledforeground=tk_entry['fg'])
+            self._tk_password_entry.grid(column=1, row=2, columnspan=2, **sticky_ew)
 
             tk.Button(master=self, text='BEENDEN', command=self.master.destroy) \
-                .grid(column=0, row=3, sticky=tk.EW, **pad)
+                .grid(column=0, row=3, **sticky_ew)
+
             self._tk_copy_button = tk.Button(master=self, text='KOPIEREN',
                                              command=self._copy_password,
                                              state=tk.DISABLED)
-            self._tk_copy_button.grid(column=1, row=3, sticky=tk.EW, **pad)
+            self._tk_copy_button.grid(column=1, row=3, **sticky_ew)
+            self._tk_show_var = tk.BooleanVar()
+
+            tk.Checkbutton(master=self, text='ANZEIGEN', variable=self._tk_show_var) \
+                .grid(column=2, row=3, **sticky_ew)
 
             self._tk_master_password_var.trace_variable('w', self._generate_password)
             self._tk_domain_var.trace_variable('w', self._generate_password)
+            self._tk_show_var.trace_variable('w', self._toggle_show)
+            self._tk_show_var.set(False)
 
         def _generate_password(self, *_):
             master_password = self._tk_master_password_var.get()
@@ -96,6 +107,9 @@ def run_gui():
         def _copy_password(self):
             self.clipboard_clear()
             self.clipboard_append(self._tk_password_var.get())
+
+        def _toggle_show(self, *_):
+            self._tk_password_entry['show'] = '' if self._tk_show_var.get() else '*'
 
     Application().mainloop()
 

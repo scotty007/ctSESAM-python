@@ -8,7 +8,7 @@ big_letters = list('ABCDEFGHJKLMNPQRTUVWXYZ')
 numbers = list('0123456789')
 special_characters = list('#!"§$%&/()[]{}=-_+*<>;:.')
 password_characters = small_letters + big_letters + numbers + special_characters
-salt = "pepper"
+salt = 'pepper'
 
 
 def convert_bytes_to_password(hashed_bytes, length):
@@ -51,24 +51,24 @@ def run_gui():
 
             pad = {'padx': 2, 'pady': 2}
 
-            self._tk_master_password = tk.StringVar()
+            self._tk_master_password_var = tk.StringVar()
             tk.Label(master=self, text='Masterpasswort:') \
                 .grid(column=0, row=0, sticky=tk.E, **pad)
-            tk_entry = tk.Entry(master=self, textvariable=self._tk_master_password,
+            tk_entry = tk.Entry(master=self, textvariable=self._tk_master_password_var,
                                 show='*')
             tk_entry.grid(column=1, row=0, **pad)
             tk_entry.focus_set()
 
-            self._tk_domain = tk.StringVar()
+            self._tk_domain_var = tk.StringVar()
             tk.Label(master=self, text='Domain:') \
                 .grid(column=0, row=1, sticky=tk.E, **pad)
-            tk.Entry(master=self, textvariable=self._tk_domain) \
+            tk.Entry(master=self, textvariable=self._tk_domain_var) \
                 .grid(column=1, row=1, **pad)
 
-            self._tk_password = tk.StringVar()
+            self._tk_password_var = tk.StringVar()
             tk.Label(master=self, text='Passwort:') \
                 .grid(column=0, row=2, sticky=tk.E, **pad)
-            tk.Label(master=self, textvariable=self._tk_password) \
+            tk.Label(master=self, textvariable=self._tk_password_var) \
                 .grid(column=1, row=2, sticky=tk.W, **pad)
 
             tk.Button(master=self, text='BEENDEN', command=self.master.destroy) \
@@ -78,24 +78,24 @@ def run_gui():
                                              state=tk.DISABLED)
             self._tk_copy_button.grid(column=1, row=3, sticky=tk.EW, **pad)
 
-            self._tk_master_password.trace_variable('w', self._generate_password)
-            self._tk_domain.trace_variable('w', self._generate_password)
+            self._tk_master_password_var.trace_variable('w', self._generate_password)
+            self._tk_domain_var.trace_variable('w', self._generate_password)
 
         def _generate_password(self, *_):
-            master_password = self._tk_master_password.get()
+            master_password = self._tk_master_password_var.get()
             if master_password:
-                domain = self._tk_domain.get()
+                domain = self._tk_domain_var.get()
                 if domain:
                     password = generate_password(master_password, domain)
-                    self._tk_password.set(password)
+                    self._tk_password_var.set(password)
                     self._tk_copy_button['state'] = tk.NORMAL
                     return
-            self._tk_password.set('')
+            self._tk_password_var.set('')
             self._tk_copy_button['state'] = tk.DISABLED
 
         def _copy_password(self):
             self.clipboard_clear()
-            self.clipboard_append(self._tk_password.get())
+            self.clipboard_append(self._tk_password_var.get())
 
     Application().mainloop()
 

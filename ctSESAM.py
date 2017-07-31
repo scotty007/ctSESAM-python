@@ -48,6 +48,7 @@ def run_gui():
             self.pack()
             self.master.title('c\'t SESAM')
             self.master.resizable(width=False, height=False)
+            self.master.protocol('WM_DELETE_WINDOW', self._quit)
 
             sticky_e = {'sticky': tk.E, 'padx': 2, 'pady': 2}
             sticky_ew = {'sticky': tk.EW, 'padx': 2, 'pady': 2}
@@ -75,15 +76,15 @@ def run_gui():
                                                disabledforeground=tk_entry['fg'])
             self._tk_password_entry.grid(column=1, row=2, columnspan=2, **sticky_ew)
 
-            tk.Button(master=self, text='BEENDEN', command=self.master.destroy) \
+            tk.Button(master=self, text='BEENDEN', command=self._quit) \
                 .grid(column=0, row=3, **sticky_ew)
 
             self._tk_copy_button = tk.Button(master=self, text='KOPIEREN',
                                              command=self._copy_password,
                                              state=tk.DISABLED)
             self._tk_copy_button.grid(column=1, row=3, **sticky_ew)
-            self._tk_show_var = tk.BooleanVar()
 
+            self._tk_show_var = tk.BooleanVar()
             tk.Checkbutton(master=self, text='ANZEIGEN', variable=self._tk_show_var) \
                 .grid(column=2, row=3, **sticky_ew)
 
@@ -91,6 +92,8 @@ def run_gui():
             self._tk_domain_var.trace_variable('w', self._generate_password)
             self._tk_show_var.trace_variable('w', self._toggle_show)
             self._tk_show_var.set(False)
+
+            self._clipboard = None
 
         def _generate_password(self, *_):
             master_password = self._tk_master_password_var.get()
@@ -105,11 +108,17 @@ def run_gui():
             self._tk_copy_button['state'] = tk.DISABLED
 
         def _copy_password(self):
+            self._clipboard = self._tk_password_var.get()
             self.clipboard_clear()
-            self.clipboard_append(self._tk_password_var.get())
+            self.clipboard_append(self._clipboard)
 
         def _toggle_show(self, *_):
             self._tk_password_entry['show'] = '' if self._tk_show_var.get() else '*'
+
+        def _quit(self):
+            if self._clipboard == self.clipboard_get():
+                self.clipboard_clear()
+            self.master.destroy()
 
     Application().mainloop()
 

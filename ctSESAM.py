@@ -116,8 +116,13 @@ def run_gui():
             self._tk_password_entry['show'] = '' if self._tk_show_var.get() else '*'
 
         def _quit(self):
-            if self._clipboard == self.clipboard_get():
-                self.clipboard_clear()
+            try:
+                clipboard = self.clipboard_get()
+            except tk.TclError:  # empty
+                pass
+            else:
+                if self._clipboard == clipboard:  # our content
+                    self.clipboard_clear()
             self.master.destroy()
 
     Application().mainloop()
